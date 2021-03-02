@@ -71,12 +71,12 @@ Descriptive and consistent naming makes software easier to read and understand. 
 - striving for clarity at the call site
 - prioritizing clarity over brevity
 - using `camelCase` (not `snake_case`)
-- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else
+- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else <!-- [@skarol] - is there an exception for ABTest enum type? -->
 - including all needed words while omitting needless words
 - using names based on roles, not types
 - sometimes compensating for weak type information
 - striving for fluent usage
-- beginning factory methods with `make`
+- beginning factory methods with `make` <!-- [@skarol] - how is it done currently? -->
 - naming methods for their side effects
   - verb methods follow the -ed, -ing rule for the non-mutating version
   - noun methods follow the formX rule for the mutating version
@@ -190,11 +190,13 @@ let colour = "red"
 
 ## Code Organization
 
-Use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized.
+Use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized. 
+<!-- [@skarol] - this is a little bit controversial as extensions are not meant to organize code. Moreover, grouping part of codes in extensions usually means that class/struct has too many responsibilities and this should be avoided. However having a model class/struct that has to conform to some protocol might fit here. -->
 
 ### Protocol Conformance
 
 In particular, when adding protocol conformance to a model, prefer adding a separate extension for the protocol methods. This keeps the related methods grouped together with the protocol and can simplify instructions to add a protocol to a class with its associated methods.
+<!-- [@skarol] - this example is bad. I do agree with Goranche - we should separate DataSources and Delegates to separate classes. I know there is a lot of places in code where it is used like this, so we should point a direction here. -->
 
 **Preferred**:
 ```swift
@@ -223,10 +225,12 @@ class MyViewController: UIViewController, UITableViewDataSource, UIScrollViewDel
 Since the compiler does not allow you to re-declare protocol conformance in a derived class, it is not always required to replicate the extension groups of the base class. This is especially true if the derived class is a terminal class and a small number of methods are being overridden. When to preserve the extension groups is left to the discretion of the author.
 
 For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction in separate class extensions.
+<!-- [@skarol] - IMHO MARKS are enough -->
 
 ### Unused Code
 
 Unused (dead) code, including Xcode template code and placeholder comments should be removed. An exception is when your tutorial or book instructs the user to use the commented code.
+<!-- [@skarol] - can we agree on removing any dead code we see? -->
 
 Aspirational methods not directly associated with the tutorial whose implementation simply calls the superclass should also be removed. This includes any empty/unused UIApplicationDelegate methods.
 
@@ -335,7 +339,7 @@ class TestDatabase : Database {
 }
 ```
 
-* Long lines should be wrapped at around 70 characters. A hard limit is intentionally not specified.
+* Long lines should be wrapped at around 70 characters. A hard limit is intentionally not specified. <!-- [@skarol] - 70? it can be longer. we should add an exception for method declaration -->
 
 * Avoid trailing whitespaces at the ends of lines.
 
@@ -346,6 +350,7 @@ class TestDatabase : Database {
 When they are needed, use comments to explain **why** a particular piece of code does something. Comments must be kept up-to-date or deleted.
 
 Avoid block comments inline with code, as the code should be as self-documenting as possible. _Exception: This does not apply to those comments used to generate documentation._
+<!-- [@skarol] - can we agree on removing any commented code we see? -->
 
 Avoid the use of C-style comments (`/* ... */`). Prefer the use of double- or triple-slash.
 
@@ -440,6 +445,7 @@ var diameter: Double {
 ### Final
 
 Marking classes or members as `final` in tutorials can distract from the main topic and is not required. Nevertheless, use of `final` can sometimes clarify your intent and is worth the cost. In the below example, `Box` has a particular purpose and customization in a derived class is not intended. Marking it `final` makes that clear.
+<!-- [@skarol] - generally I would use final, we are not writing a tutorial here -->
 
 ```swift
 // Turn any generic type into a reference type using this Box class.
@@ -462,6 +468,7 @@ func reticulateSplines(spline: [Double]) -> Bool {
 ```
 
 For functions with long signatures, put each parameter on a new line and add an extra indent on subsequent lines:
+<!-- [@skarol] - do we want to do that? It looks even worse when function doesn't return any value -->
 
 ```swift
 func reticulateSplines(
@@ -478,6 +485,11 @@ Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void
 
 **Preferred**:
 
+<!-- [@skarol] - why returning a Void in the example below? 
+func updateConstraints() { 
+  ... 
+}
+ -->
 ```swift
 func updateConstraints() -> Void {
   // magic happens here
@@ -513,6 +525,7 @@ let success = reticulateSplines(
   translateConstant: 2,
   comment: "normalize the display")
 ```
+<!-- [@skarol] - can ending bracket be in a new line? -->
 
 ## Closure Expressions
 
@@ -553,6 +566,7 @@ attendeeList.sort { a, b in
 ```
 
 Chained methods using trailing closures should be clear and easy to read in context. Decisions on spacing, line breaks, and when to use named versus anonymous arguments is left to the discretion of the author. Examples:
+<!-- [@skarol] - we should agree on something here. like chaining in new line -->
 
 ```swift
 let value = numbers.map { $0 * 2 }.filter { $0 % 3 == 0 }.index(of: 90)
@@ -1057,6 +1071,7 @@ let message = "You cannot charge the flux " +
 ## No Emoji
 
 Do not use emoji in your projects. For those readers who actually type in their code, it's an unnecessary source of friction. While it may be cute, it doesn't add to the learning and it interrupts the coding flow for these readers.
+<!-- [@skarol] - please let's make an exception for the documentation (separate files, markdowns, no code documentation) -->
 
 ## No #imageLiteral or #colorLiteral
 
