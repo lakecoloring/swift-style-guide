@@ -201,7 +201,7 @@ When adding protocol conformance to a model, prefer adding a separate extension 
 
 Since the compiler does not allow you to re-declare protocol conformance in a derived class, it is not always required to replicate the extension groups of the base class. This is especially true if the derived class is a terminal class and a small number of methods are being overridden. When to preserve the extension groups is left to the discretion of the author.
 
-For DataSource, Delegate, etc conformances try to separate classes wherever it is possible and keep them out of view controller. If this is not possible put protocol conformances into extensions.
+For DataSource, Delegate, etc conformances try to separate classes wherever it is possible and keep them out of view controller. When class is dedicated DataSource or Delegate you can declare confomance in class definition and don't have to declare it in extension. If this creating dedicated classes is not possible put protocol conformances into extensions.
 
 For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction with `// MARK:`.
 
@@ -212,22 +212,13 @@ class ViewController: UIViewController {
   let scrollDelegate: ScrollDelegate
   // ...
 }
-
-class DataSource: UICollectionViewDataSource 
+ 
+class DataSource: UICollectionViewDataSource {
   // ...
 }
 
-// MARK: - UICollectionViewDataSource conformance
-extension DataSource: UICollectionViewDataSource {
-  // UICollectionViewDataSource methods
-}
-
-class ScrollDelegate {
-
-}
-// MARK: UIScrollViewDelegate conformance
 class ScrollDelegate: UIScrollViewDelegate {
-  // UIScrollViewDelegate methods
+  // ...
 }
 ```
 **Less Preferred**:
