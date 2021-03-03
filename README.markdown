@@ -1098,9 +1098,11 @@ Likewise, do not use Xcode's ability to drag a color or an image into a source s
 
 ## Organization and Bundle Identifier
 
-Where an Xcode project is involved, the organization should be set to `Lake` and the Bundle Identifier set to `com.lake.Name` where `Name` is the name of the project.
-
-![Xcode Project settings](screens/project_settings.png)
+Where an Xcode project is involved, the organization should be set to `Lake` and the Bundle Identifier set to `com.lake.coloring.Name` where `Name` is the name of the project. 
+Special case are:
+- Lake(`com.lake.coloring`)
+- Lake - Retail(`com.lake.coloring.retaildemo`)
+- Lake - Drawing Prep(`com.lake.coloring.drawingprep`).
 
 ## Copyright Statement
 
