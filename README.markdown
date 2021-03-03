@@ -201,6 +201,8 @@ When adding protocol conformance to a model, prefer adding a separate extension 
 
 Since the compiler does not allow you to re-declare protocol conformance in a derived class, it is not always required to replicate the extension groups of the base class. This is especially true if the derived class is a terminal class and a small number of methods are being overridden. When to preserve the extension groups is left to the discretion of the author.
 
+Avoid inheriting from `UICollectionvViewController` and `UITableViewController` use `UIViewController` with composition instead.
+
 For DataSource, Delegate, etc conformances try to separate classes wherever it is possible and keep them out of view controller. When class is dedicated DataSource or Delegate you can declare confomance in class definition and don't have to declare it in extension. If this creating dedicated classes is not possible put protocol conformances into extensions.
 
 For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction with `// MARK:`.
