@@ -190,49 +190,73 @@ let colour = "red"
 
 ## Code Organization
 
-Use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized. 
-<!-- [@skarol] - this is a little bit controversial as extensions are not meant to organize code. Moreover, grouping part of codes in extensions usually means that class/struct has too many responsibilities and this should be avoided. However having a model class/struct that has to conform to some protocol might fit here. -->
+Separate functionality into different types to follow the [single-responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+
+If needed use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized. In general this should not be needed if you follow single-responsibility principle.
+
 
 ### Protocol Conformance
 
-In particular, when adding protocol conformance to a model, prefer adding a separate extension for the protocol methods. This keeps the related methods grouped together with the protocol and can simplify instructions to add a protocol to a class with its associated methods.
-<!-- [@skarol] - this example is bad. I do agree with Goranche - we should separate DataSources and Delegates to separate classes. I know there is a lot of places in code where it is used like this, so we should point a direction here. -->
-
-**Preferred**:
-```swift
-class MyViewController: UIViewController {
-  // class stuff here
-}
-
-// MARK: - UITableViewDataSource
-extension MyViewController: UITableViewDataSource {
-  // table view data source methods
-}
-
-// MARK: - UIScrollViewDelegate
-extension MyViewController: UIScrollViewDelegate {
-  // scroll view delegate methods
-}
-```
-
-**Not Preferred**:
-```swift
-class MyViewController: UIViewController, UITableViewDataSource, UIScrollViewDelegate {
-  // all methods
-}
-```
+When adding protocol conformance to a model, prefer adding a separate extension for the protocol methods. This keeps the related methods grouped together with the protocol and can simplify instructions to add a protocol to a class with its associated methods.
 
 Since the compiler does not allow you to re-declare protocol conformance in a derived class, it is not always required to replicate the extension groups of the base class. This is especially true if the derived class is a terminal class and a small number of methods are being overridden. When to preserve the extension groups is left to the discretion of the author.
 
-For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction in separate class extensions.
-<!-- [@skarol] - IMHO MARKS are enough -->
+For DataSource, Delegate, etc conformances try to separate classes wherever it is possible and keep them out of view controller. If this is not possible put protocol conformances into extensions.
 
+For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction with `// MARK:`.
+
+**Preferred**:
+```swift
+class ViewController: UIViewController {
+  let dataSource: DataSource
+  let scrollDelegate: ScrollDelegate
+  // ...
+}
+
+class DataSource: UICollectionViewDataSource 
+  // ...
+}
+
+// MARK: - UICollectionViewDataSource conformance
+extension DataSource: UICollectionViewDataSource {
+  // UICollectionViewDataSource methods
+}
+
+class ScrollDelegate {
+
+}
+// MARK: UIScrollViewDelegate conformance
+class ScrollDelegate: UIScrollViewDelegate {
+  // UIScrollViewDelegate methods
+}
+```
+**Less Preferred**:
+```swift
+class ViewController: UIViewController {
+  // ...
+}
+
+// MARK: - UICollectionViewDataSource conformance
+extension ViewController: UICollectionViewDataSource {
+  // ...
+}
+
+// MARK: - UIScrollViewDelegate conformance
+extension ViewController: UIScrollViewDelegate {
+  // ...
+}
+```
+**Not Preferred**:
+```swift
+class ViewController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource {
+  // all methods
+}
+```
 ### Unused Code
 
-Unused (dead) code, including Xcode template code and placeholder comments should be removed. An exception is when your tutorial or book instructs the user to use the commented code.
-<!-- [@skarol] - can we agree on removing any dead code we see? -->
+Unused (dead) code, including Xcode template code and placeholder comments should be removed.
 
-Aspirational methods not directly associated with the tutorial whose implementation simply calls the superclass should also be removed. This includes any empty/unused UIApplicationDelegate methods.
+Aspirational methods whose implementation simply calls the superclass should also be removed. This includes any empty/unused UIApplicationDelegate methods.
 
 **Preferred**:
 ```swift
@@ -297,7 +321,7 @@ var deviceModels: [String]
 ![Xcode indent settings](screens/indentation.png)
 
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
-* Tip: You can re-indent by selecting some code (or **Command-A** to select all) and then **Control-I** (or **Editor ▸ Structure ▸ Re-Indent** in the menu). Some of the Xcode template code will have 4-space tabs hard coded, so this is a good way to fix that.
+* Tip: You can re-indent by selecting some code (or **Command-A** to select all) and then **Control-I** (or **Editor ▸ Structure ▸ Re-Indent** in the menu).
 
 **Preferred**:
 ```swift
@@ -339,7 +363,7 @@ class TestDatabase : Database {
 }
 ```
 
-* Long lines should be wrapped at around 70 characters. A hard limit is intentionally not specified. <!-- [@skarol] - 70? it can be longer. we should add an exception for method declaration -->
+* Long lines should be wrapped at around 160 characters.
 
 * Avoid trailing whitespaces at the ends of lines.
 
@@ -444,8 +468,8 @@ var diameter: Double {
 
 ### Final
 
-Marking classes or members as `final` in tutorials can distract from the main topic and is not required. Nevertheless, use of `final` can sometimes clarify your intent and is worth the cost. In the below example, `Box` has a particular purpose and customization in a derived class is not intended. Marking it `final` makes that clear.
-<!-- [@skarol] - generally I would use final, we are not writing a tutorial here -->
+Use `final` keyword when needed, `Box` has a particular purpose and customization in a derived class is not intended. Marking it `final` makes that clear.
+
 
 ```swift
 // Turn any generic type into a reference type using this Box class.
@@ -459,17 +483,16 @@ final class Box<T> {
 
 ## Function Declarations
 
-Keep short function declarations on one line including the opening brace:
+Keep function declarations on one line including the opening brace:
 
+**Preffered:**
 ```swift
-func reticulateSplines(spline: [Double]) -> Bool {
+func reticulateSplines(pline: [Double], adjustmentFactor: Double, translateConstant: Int, comment: String) -> Bool {
   // reticulate code goes here
 }
 ```
 
-For functions with long signatures, put each parameter on a new line and add an extra indent on subsequent lines:
-<!-- [@skarol] - do we want to do that? It looks even worse when function doesn't return any value -->
-
+**Not Preffered:**
 ```swift
 func reticulateSplines(
   spline: [Double], 
@@ -481,17 +504,11 @@ func reticulateSplines(
 }
 ```
 
-Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void` instead of `()` for closure and function outputs.
+Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void` instead of `()` for closure return type. You should omit `Void` return type when ever possible.
 
 **Preferred**:
-
-<!-- [@skarol] - why returning a Void in the example below? 
-func updateConstraints() { 
-  ... 
-}
- -->
 ```swift
-func updateConstraints() -> Void {
+func updateConstraints(){
   // magic happens here
 }
 
@@ -502,6 +519,10 @@ typealias CompletionHandler = (result) -> Void
 
 ```swift
 func updateConstraints() -> () {
+  // magic happens here
+}
+
+func updateConstraints2() -> Void {
   // magic happens here
 }
 
@@ -523,9 +544,9 @@ let success = reticulateSplines(
   spline: splines,
   adjustmentFactor: 1.3,
   translateConstant: 2,
-  comment: "normalize the display")
+  comment: "normalize the display"
+)
 ```
-<!-- [@skarol] - can ending bracket be in a new line? -->
 
 ## Closure Expressions
 
@@ -565,18 +586,26 @@ attendeeList.sort { a, b in
 }
 ```
 
-Chained methods using trailing closures should be clear and easy to read in context. Decisions on spacing, line breaks, and when to use named versus anonymous arguments is left to the discretion of the author. Examples:
-<!-- [@skarol] - we should agree on something here. like chaining in new line -->
+Chained methods using trailing closures should be clear and easy to read in context. 
+Each chaned call should be done in a new line. You can use annonymous argumets in simple closures. There should be space between curly braces and single line closure content.
 
+**Preferred**:
 ```swift
-let value = numbers.map { $0 * 2 }.filter { $0 % 3 == 0 }.index(of: 90)
+let value = numbers
+  .map { $0 * 2 }
+  .filter { $0 > 50 }
+  .map { $0 + 10 }
+```
+
+**Not Preferred**:
+```swift
+let value = numbers.map { $0 * 2 }.filter { $0 > 50 }.map { $0 + 10 }
 
 let value = numbers
   .map {$0 * 2}
   .filter {$0 > 50}
   .map {$0 + 10}
 ```
-
 ## Types
 
 Always use Swift's native types and expressions when available. Swift offers bridging to Objective-C so you can still use the full set of methods as needed.
@@ -1070,8 +1099,7 @@ let message = "You cannot charge the flux " +
 
 ## No Emoji
 
-Do not use emoji in your projects. For those readers who actually type in their code, it's an unnecessary source of friction. While it may be cute, it doesn't add to the learning and it interrupts the coding flow for these readers.
-<!-- [@skarol] - please let's make an exception for the documentation (separate files, markdowns, no code documentation) -->
+Do not use emoji in code or code comments. You can use emoji in documentation, markdown files.
 
 ## No #imageLiteral or #colorLiteral
 
