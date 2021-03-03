@@ -508,7 +508,7 @@ Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void
 
 **Preferred**:
 ```swift
-func updateConstraints(){
+func updateConstraints() {
   // magic happens here
 }
 
