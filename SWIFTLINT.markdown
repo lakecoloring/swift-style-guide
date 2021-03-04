@@ -35,7 +35,7 @@ If you are unable to use Homebrew, you may use one of the other methods describe
 
 ## Using the configuration file
 
-Download **com.raywenderlich.swiftlint.yml** from the [Swift Style Guide repo](https://github.com/raywenderlich/swift-style-guide) and place the project and rename it to : **.swiftlint.yml**.
+Download **com.raywenderlich.swiftlint.yml** from the [Swift Style Guide repo](https://github.com/lakecoloring/swift-style-guide) and place the project and rename it to : **.swiftlint.yml**.
 
 ## Xcode settings
 
