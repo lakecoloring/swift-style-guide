@@ -155,6 +155,6 @@ Occasionally, you'll find it necessary to include an unmodified open-source file
 
 ## Other notes
 
-While SwiftLint goes a long way towards making your source code compliant with our style guide, it doesn't cover everything. For example, it won't catch or force you to correct the formatting for multi-condition `guard` statements. (See [Golden Path](https://github.com/raywenderlich/swift-style-guide#golden-path) for correct formatting.)
+While SwiftLint goes a long way towards making your source code compliant with our style guide, it doesn't cover everything. For example, it won't catch or force you to correct the formatting for multi-condition `guard` statements. (See [Golden Path](https://github.com/lakecoloring/swift-style-guide#golden-path) for correct formatting.)
 
 If you find yourself butting heads with SwiftLint, please reach out to the iOS Team Lead with details.
