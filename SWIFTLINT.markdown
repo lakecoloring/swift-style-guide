@@ -1,10 +1,8 @@
-# The Official raywenderlich.com SwiftLint Policy
+# The Lake SwiftLint Policy
 
-The SwiftLint configuration in this repo is designed to ensure the work we create at raywenderlich.com conforms with [The Official raywenderlich.com Swift Style Guide](https://github.com/raywenderlich/swift-style-guide).
+The SwiftLint configuration in this repo is designed to ensure the work we create at Lake conforms with [The Lake Swift Style Guide](https://github.com/lakecoloring/swift-style-guide).
 
-The focus of this style is to improve readability in our print and web publications. Therefore, this style may be different from others you've been used to, but the demands of print and online reading are different than other contexts.
-
-The policies described here have a goal of achieving consistency between all of our projects, which will also streamline the flow of content through our editing process. Some of the choices are also to make sure that we've removed as much of the burden from our readers as possible.
+The policies described here have a goal of achieving consistency between all of our projects. Some of the choices are also to make sure that we've removed as much of the burden from our readers as possible.
 
 These guides use SwiftLint as a standard. You can learn more about SwiftLint by visiting its [official documentation page](https://github.com/realm/SwiftLint).
 
@@ -25,7 +23,7 @@ These guides use SwiftLint as a standard. You can learn more about SwiftLint by 
 
 ## Installing SwiftLint
 
-We recommend that raywenderlich.com team members install SwiftLint using Homebrew:
+We recommend that Lake team members install SwiftLint using Homebrew:
 
 ```bash
 brew install swiftlint
@@ -37,9 +35,7 @@ If you are unable to use Homebrew, you may use one of the other methods describe
 
 ## Using the configuration file
 
-**Do not** place the configuration file inside your project. We don't want to impose this style on readers without their express knowledge or understanding of what's going on. 
-
-Download **com.raywenderlich.swiftlint.yml** from the [Swift Style Guide repo](https://github.com/raywenderlich/swift-style-guide) and place it your home directory: **~/com.raywenderlich.swiftlint.yml**.
+Download **com.raywenderlich.swiftlint.yml** from the [Swift Style Guide repo](https://github.com/lakecoloring/swift-style-guide) and place the project and rename it to : **.swiftlint.yml**.
 
 ## Xcode settings
 
@@ -65,17 +61,19 @@ To simplify the process for everyone in the content pipeline, you'll need to add
 ![](screens/empty-run-script.png)
 
 6. Add the following script:
-```
-if [ -f ~/com.raywenderlich.swiftlint.yml ]; then
-  if which swiftlint >/dev/null; then
-    swiftlint --no-cache --config ~/com.raywenderlich.swiftlint.yml
-  fi
+```bash
+if which swiftlint >/dev/null; then
+    swiftlint
+elif which /opt/homebrew/bin/swiftlint >/dev/null; then
+    /opt/homebrew/bin/swiftlint
+else
+	echo "warning: SwiftLint not installed, install using `brew install swiftlint` or download from https://github.com/realm/SwiftLint"
 fi
 ```
 
 ## Handling rule exceptions
 
-Your sample project must compile without warnings — SwiftLint or otherwise. In general, you should change your code to eliminate all warnings where necessary. When it comes to SwiftLint, however, there will be times when this isn't possible. In these situations, you'll need to use in-line comments to temporarily disable rules. You can find appropriate syntax to do this in [the SwiftLint documentation](https://realm.github.io/SwiftLint/#disable-rules-in-code).
+Your project must compile without warnings — SwiftLint or otherwise. In general, you should change your code to eliminate all warnings where necessary. When it comes to SwiftLint, however, there will be times when this isn't possible. In these situations, you'll need to use in-line comments to temporarily disable rules. You can find appropriate syntax to do this in [the SwiftLint documentation](https://realm.github.io/SwiftLint/#disable-rules-in-code).
 
 You may only disable a rule if it is on the list of approved exceptions listed below.
 
@@ -116,10 +114,6 @@ If you find that you're struggling with rules other than those described below, 
 
 It is sometimes common, in lieu of using dependency injection, to declare a child view controller's properties as Implicitly Unwrapped Optionals (IUO). If you're unable to structure your project to avoid this, you may disable the `implicitly_unwrapped_optional` rule for those dependency declarations. With the advent of `@IBSegueAction`, this should be rare.
 
-### Force cast
-
-You may use force casting — and disable the `force_cast` rule — in the `UITableViewDataSource` and `UICollectionViewDataSource` methods that dequeue cells.
-
 ### Force unwrapping
 
 You may use forced unwrapping — rule name `force_unwrap` — when returning a color from an asset catalog:
@@ -130,8 +124,6 @@ static var rwGreen: UIColor {
   UIColor(named: "rw-green")!
 }
 ```
-
-You may also use it in the same context as the force cast exception above, dequeuing cells in `UITableViewDataSource` and `UICollectionViewDataSource` methods.
 
 Although it's preferred that you model appropriately defensive code for our readers, you may use force unwrapping to access resources that you _know_ are included in the app bundle.
 
@@ -163,6 +155,6 @@ Occasionally, you'll find it necessary to include an unmodified open-source file
 
 ## Other notes
 
-While SwiftLint goes a long way towards making your source code compliant with our style guide, it doesn't cover everything. For example, it won't catch or force you to correct the formatting for multi-condition `guard` statements. (See [Golden Path](https://github.com/raywenderlich/swift-style-guide#golden-path) for correct formatting.)
+While SwiftLint goes a long way towards making your source code compliant with our style guide, it doesn't cover everything. For example, it won't catch or force you to correct the formatting for multi-condition `guard` statements. (See [Golden Path](https://github.com/lakecoloring/swift-style-guide#golden-path) for correct formatting.)
 
-This configuration has been tested against several dozen of our most recent tutorials. A couple of rules, such as the line length limit or the limit on the length of a function, may need tweaking to fit our style. If you find yourself butting heads with SwiftLint, please reach out to the iOS Team Lead with details.
+If you find yourself butting heads with SwiftLint, please reach out to the iOS Team Lead with details.

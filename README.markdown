@@ -1,4 +1,4 @@
-# The Official raywenderlich.com Swift Style Guide.
+# Lake Swift Style Guide based on The Official raywenderlich.com Swift Style Guide.
 ### Updated for Swift 5
 
 This style guide is different from others you may see, because the focus is centered on readability for print and the web. We created this style guide to keep the code in our books, tutorials, and starter kits nice and consistent — even though we have many different authors working on the books.
@@ -71,12 +71,12 @@ Descriptive and consistent naming makes software easier to read and understand. 
 - striving for clarity at the call site
 - prioritizing clarity over brevity
 - using `camelCase` (not `snake_case`)
-- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else
+- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else <!-- [@skarol] - is there an exception for ABTest enum type? -->
 - including all needed words while omitting needless words
 - using names based on roles, not types
 - sometimes compensating for weak type information
 - striving for fluent usage
-- beginning factory methods with `make`
+- beginning factory methods with `make` <!-- [@skarol] - how is it done currently? -->
 - naming methods for their side effects
   - verb methods follow the -ed, -ing rule for the non-mutating version
   - noun methods follow the formX rule for the mutating version
@@ -190,45 +190,66 @@ let colour = "red"
 
 ## Code Organization
 
-Use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized.
+Separate functionality into different types to follow the [single-responsibility principle](https://en.wikipedia.org/wiki/Single-responsibility_principle).
+
+If needed use extensions to organize your code into logical blocks of functionality. Each extension should be set off with a `// MARK: -` comment to keep things well-organized. In general this should not be needed if you follow single-responsibility principle.
+
 
 ### Protocol Conformance
 
-In particular, when adding protocol conformance to a model, prefer adding a separate extension for the protocol methods. This keeps the related methods grouped together with the protocol and can simplify instructions to add a protocol to a class with its associated methods.
-
-**Preferred**:
-```swift
-class MyViewController: UIViewController {
-  // class stuff here
-}
-
-// MARK: - UITableViewDataSource
-extension MyViewController: UITableViewDataSource {
-  // table view data source methods
-}
-
-// MARK: - UIScrollViewDelegate
-extension MyViewController: UIScrollViewDelegate {
-  // scroll view delegate methods
-}
-```
-
-**Not Preferred**:
-```swift
-class MyViewController: UIViewController, UITableViewDataSource, UIScrollViewDelegate {
-  // all methods
-}
-```
+When adding protocol conformance to a model, prefer adding a separate extension for the protocol methods. This keeps the related methods grouped together with the protocol and can simplify instructions to add a protocol to a class with its associated methods.
 
 Since the compiler does not allow you to re-declare protocol conformance in a derived class, it is not always required to replicate the extension groups of the base class. This is especially true if the derived class is a terminal class and a small number of methods are being overridden. When to preserve the extension groups is left to the discretion of the author.
 
-For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction in separate class extensions.
+Avoid inheriting from `UICollectionvViewController` and `UITableViewController` use `UIViewController` with composition instead.
 
+For DataSource, Delegate, etc conformances try to separate classes wherever it is possible and keep them out of view controller. When class is dedicated DataSource or Delegate you can declare confomance in class definition and don't have to declare it in extension. If this creating dedicated classes is not possible put protocol conformances into extensions.
+
+For UIKit view controllers, consider grouping lifecycle, custom accessors, and IBAction with `// MARK:`.
+
+**Preferred**:
+```swift
+class ViewController: UIViewController {
+  let dataSource: DataSource
+  let scrollDelegate: ScrollDelegate
+  // ...
+}
+ 
+class DataSource: UICollectionViewDataSource {
+  // ...
+}
+
+class ScrollDelegate: UIScrollViewDelegate {
+  // ...
+}
+```
+**Less Preferred**:
+```swift
+class ViewController: UIViewController {
+  // ...
+}
+
+// MARK: - UICollectionViewDataSource conformance
+extension ViewController: UICollectionViewDataSource {
+  // ...
+}
+
+// MARK: - UIScrollViewDelegate conformance
+extension ViewController: UIScrollViewDelegate {
+  // ...
+}
+```
+**Not Preferred**:
+```swift
+class ViewController: UIViewController, UIScrollViewDelegate, UICollectionViewDataSource {
+  // all methods
+}
+```
 ### Unused Code
 
-Unused (dead) code, including Xcode template code and placeholder comments should be removed. An exception is when your tutorial or book instructs the user to use the commented code.
+Unused (dead) code, including Xcode template code and placeholder comments should be removed.
 
-Aspirational methods not directly associated with the tutorial whose implementation simply calls the superclass should also be removed. This includes any empty/unused UIApplicationDelegate methods.
+Aspirational methods whose implementation simply calls the superclass should also be removed. This includes any empty/unused UIApplicationDelegate methods.
 
 **Preferred**:
 ```swift
@@ -288,12 +309,12 @@ var deviceModels: [String]
 
 ## Spacing
 
-* Indent using 2 spaces rather than tabs to conserve space and help prevent line wrapping. Be sure to set this preference in Xcode and in the Project settings as shown below:
+* Indent using 4 spaces rather than tabs to conserve space and help prevent line wrapping. Be sure to set this preference in Xcode and in the Project settings as shown below:
 
 ![Xcode indent settings](screens/indentation.png)
 
 * Method braces and other braces (`if`/`else`/`switch`/`while` etc.) always open on the same line as the statement but close on a new line.
-* Tip: You can re-indent by selecting some code (or **Command-A** to select all) and then **Control-I** (or **Editor ▸ Structure ▸ Re-Indent** in the menu). Some of the Xcode template code will have 4-space tabs hard coded, so this is a good way to fix that.
+* Tip: You can re-indent by selecting some code (or **Command-A** to select all) and then **Control-I** (or **Editor ▸ Structure ▸ Re-Indent** in the menu).
 
 **Preferred**:
 ```swift
@@ -335,7 +356,7 @@ class TestDatabase : Database {
 }
 ```
 
-* Long lines should be wrapped at around 70 characters. A hard limit is intentionally not specified.
+* Long lines should be wrapped at around 160 characters.
 
 * Avoid trailing whitespaces at the ends of lines.
 
@@ -346,6 +367,7 @@ class TestDatabase : Database {
 When they are needed, use comments to explain **why** a particular piece of code does something. Comments must be kept up-to-date or deleted.
 
 Avoid block comments inline with code, as the code should be as self-documenting as possible. _Exception: This does not apply to those comments used to generate documentation._
+<!-- [@skarol] - can we agree on removing any commented code we see? -->
 
 Avoid the use of C-style comments (`/* ... */`). Prefer the use of double- or triple-slash.
 
@@ -439,7 +461,8 @@ var diameter: Double {
 
 ### Final
 
-Marking classes or members as `final` in tutorials can distract from the main topic and is not required. Nevertheless, use of `final` can sometimes clarify your intent and is worth the cost. In the below example, `Box` has a particular purpose and customization in a derived class is not intended. Marking it `final` makes that clear.
+Use `final` keyword when needed, `Box` has a particular purpose and customization in a derived class is not intended. Marking it `final` makes that clear.
+
 
 ```swift
 // Turn any generic type into a reference type using this Box class.
@@ -453,16 +476,16 @@ final class Box<T> {
 
 ## Function Declarations
 
-Keep short function declarations on one line including the opening brace:
+Keep function declarations on one line including the opening brace:
 
+**Preffered:**
 ```swift
-func reticulateSplines(spline: [Double]) -> Bool {
+func reticulateSplines(pline: [Double], adjustmentFactor: Double, translateConstant: Int, comment: String) -> Bool {
   // reticulate code goes here
 }
 ```
 
-For functions with long signatures, put each parameter on a new line and add an extra indent on subsequent lines:
-
+**Not Preffered:**
 ```swift
 func reticulateSplines(
   spline: [Double], 
@@ -474,12 +497,11 @@ func reticulateSplines(
 }
 ```
 
-Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void` instead of `()` for closure and function outputs.
+Don't use `(Void)` to represent the lack of an input; simply use `()`. Use `Void` instead of `()` for closure return type. You should omit `Void` return type when ever possible.
 
 **Preferred**:
-
 ```swift
-func updateConstraints() -> Void {
+func updateConstraints() {
   // magic happens here
 }
 
@@ -490,6 +512,10 @@ typealias CompletionHandler = (result) -> Void
 
 ```swift
 func updateConstraints() -> () {
+  // magic happens here
+}
+
+func updateConstraints2() -> Void {
   // magic happens here
 }
 
@@ -511,7 +537,8 @@ let success = reticulateSplines(
   spline: splines,
   adjustmentFactor: 1.3,
   translateConstant: 2,
-  comment: "normalize the display")
+  comment: "normalize the display"
+)
 ```
 
 ## Closure Expressions
@@ -552,17 +579,26 @@ attendeeList.sort { a, b in
 }
 ```
 
-Chained methods using trailing closures should be clear and easy to read in context. Decisions on spacing, line breaks, and when to use named versus anonymous arguments is left to the discretion of the author. Examples:
+Chained methods using trailing closures should be clear and easy to read in context. 
+Each chaned call should be done in a new line. You can use annonymous argumets in simple closures. There should be space between curly braces and single line closure content.
 
+**Preferred**:
 ```swift
-let value = numbers.map { $0 * 2 }.filter { $0 % 3 == 0 }.index(of: 90)
+let value = numbers
+  .map { $0 * 2 }
+  .filter { $0 > 50 }
+  .map { $0 + 10 }
+```
+
+**Not Preferred**:
+```swift
+let value = numbers.map { $0 * 2 }.filter { $0 > 50 }.map { $0 + 10 }
 
 let value = numbers
   .map {$0 * 2}
   .filter {$0 > 50}
   .map {$0 + 10}
 ```
-
 ## Types
 
 Always use Swift's native types and expressions when available. Swift offers bridging to Objective-C so you can still use the full set of methods as needed.
@@ -1056,7 +1092,7 @@ let message = "You cannot charge the flux " +
 
 ## No Emoji
 
-Do not use emoji in your projects. For those readers who actually type in their code, it's an unnecessary source of friction. While it may be cute, it doesn't add to the learning and it interrupts the coding flow for these readers.
+Do not use emoji in code or code comments. You can use emoji in documentation, markdown files.
 
 ## No #imageLiteral or #colorLiteral
 
@@ -1064,65 +1100,21 @@ Likewise, do not use Xcode's ability to drag a color or an image into a source s
 
 ## Organization and Bundle Identifier
 
-Where an Xcode project is involved, the organization should be set to `Ray Wenderlich` and the Bundle Identifier set to `com.raywenderlich.TutorialName` where `TutorialName` is the name of the tutorial project.
-
-![Xcode Project settings](screens/project_settings.png)
+Where an Xcode project is involved, the organization should be set to `Lake` and the Bundle Identifier set to `com.lake.coloring.Name` where `Name` is the name of the project. 
+Special case are:
+- Lake(`com.lake.coloring`)
+- Lake - Retail(`com.lake.coloring.retaildemo`)
+- Lake - Drawing Prep(`com.lake.coloring.drawingprep`).
 
 ## Copyright Statement
 
-The following copyright statement should be included at the top of every source
-file:
+Use Xcode default copyright statement.
 
-```swift
-/// Copyright (c) 2021 Razeware LLC
-/// 
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Notwithstanding the foregoing, you may not use, copy, modify, merge, publish,
-/// distribute, sublicense, create a derivative work, and/or sell copies of the
-/// Software in any work that is designed, intended, or marketed for pedagogical or
-/// instructional purposes related to programming, coding, application development,
-/// or information technology.  Permission for such use, copying, modification,
-/// merger, publication, distribution, sublicensing, creation of derivative works,
-/// or sale is expressly withheld.
-/// 
-/// This project and source code may use libraries or frameworks that are
-/// released under various Open-Source licenses. Use of those libraries and
-/// frameworks are governed by their own individual licenses.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-```
-
-## Smiley Face
-
-Smiley faces are a very prominent style feature of the [raywenderlich.com](https://www.raywenderlich.com/) site! It is very important to have the correct smile signifying the immense amount of happiness and excitement for the coding topic. The closing square bracket `]` is used because it represents the largest smile able to be captured using ASCII art. A closing parenthesis `)` creates a half-hearted smile, and thus is not preferred.
-
-**Preferred**:
-```
-:]
-```
-
-**Not Preferred**:
-```
-:)
-```
 
 ## References
 
+
+* [The Official raywenderlich.com Swift Style Guide](https://github.com/raywenderlich/swift-style-guide)
 * [The Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
 * [The Swift Programming Language](https://developer.apple.com/library/prerelease/ios/documentation/swift/conceptual/swift_programming_language/index.html)
 * [Using Swift with Cocoa and Objective-C](https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/BuildingCocoaApps/index.html)
