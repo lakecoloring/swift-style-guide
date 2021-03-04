@@ -71,12 +71,12 @@ Descriptive and consistent naming makes software easier to read and understand. 
 - striving for clarity at the call site
 - prioritizing clarity over brevity
 - using `camelCase` (not `snake_case`)
-- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else <!-- [@skarol] - is there an exception for ABTest enum type? -->
+- using `UpperCamelCase` for types and protocols, `lowerCamelCase` for everything else
 - including all needed words while omitting needless words
 - using names based on roles, not types
 - sometimes compensating for weak type information
 - striving for fluent usage
-- beginning factory methods with `make` <!-- [@skarol] - how is it done currently? -->
+- beginning factory methods with `make`
 - naming methods for their side effects
   - verb methods follow the -ed, -ing rule for the non-mutating version
   - noun methods follow the formX rule for the mutating version
@@ -367,7 +367,6 @@ class TestDatabase : Database {
 When they are needed, use comments to explain **why** a particular piece of code does something. Comments must be kept up-to-date or deleted.
 
 Avoid block comments inline with code, as the code should be as self-documenting as possible. _Exception: This does not apply to those comments used to generate documentation._
-<!-- [@skarol] - can we agree on removing any commented code we see? -->
 
 Avoid the use of C-style comments (`/* ... */`). Prefer the use of double- or triple-slash.
 
